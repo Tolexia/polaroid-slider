@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polaroid slider</title>
+</head>
+<style>
+    body, html, .slider
+    {
+        min-height: 100vh;
+        min-width: 100vw;
+    }
+    *{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body
+    {
+        background-color: #f8e9dd;
+    }
+    .slider
+    {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        /* padding-right: 5em; */
+        height: 100%;
+        width: 100%;
+    }
+
+    .slider-center .polaroid
+    {
+        transform: unset;
+        scale: 1;
+    }
+    .slider > div
+    {
+        border: 1px solid red;
+        width: 33%;
+        height: 100%;
+        position: relative;
+    }
+    .polaroid
+    {
+        display: inline;
+        width: 250px;
+        height: 290px;
+        background-color: #fff;
+        padding: 20px 20px 30px 20px;
+        margin-right: 2em;
+        box-shadow: 2px 0 10px grey;
+        position: absolute;
+        bottom: 60%;
+        left: 30%;
+        scale: .5;
+        transform-style: preserve-3d;
+    }
+    .photo
+    {
+        background-color: black;
+        height: 200px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        pointer-events: none;
+    }
+    .slider img 
+    {
+        display: block;
+        margin: auto;
+        max-width: 100%;
+        max-height: 100%;
+        pointer-events: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+
+
+
+    /* KEYFRAMES */
+    @keyframes rightToCenter {
+        /* 0%{
+            transform: initial;
+        } */
+        90%
+        {
+            transform: translateX(-100%);
+        }
+        100%{
+            transform: translateX(-100%);
+            scale: 1;
+            left: -31.5%;
+        }
+    }
+    @keyframes centerToLeft {
+        /* 0%{
+            transform: initial;
+        } */
+       
+        100%{
+            scale: .5;
+            left: -70%;
+            transform: rotate(var(--rotation));
+        }
+    }
+    @keyframes leftToCenter {
+        /* 0%{
+            transform: initial;
+        } */
+        90%
+        {
+            transform: translateX(100%);
+        }
+        100%{
+            transform: translateX(100%);
+            scale: 1;
+            left: 90%;
+        }
+    }
+    @keyframes centerToRight {
+        /* 0%{
+            transform: initial;
+        } */
+       
+        100%{
+            scale: .5;
+            left: 130%;
+            transform: rotate(var(--rotation));
+        }
+    }
+</style>
+<body>
+    <section class="slider" id = "slider">
+        <div class="slider-left"></div>
+        <div class="slider-center"></div>
+        <div class="slider-right">
+            <div class="polaroid">
+                <div class="photo">
+                    <img src="./paysage.jpg" alt="">
+                </div>
+            </div>
+            <div class="polaroid">
+                <div class="photo">
+                    <img src="./portrait.jpg" alt="">
+                </div>
+            </div>
+            <div class="polaroid">
+                <div class="photo">
+                    <img src="./paysage.jpg" alt="">
+                </div>
+            </div>
+            <div class="polaroid">
+                <div class="photo">
+                    <img src="./portrait.jpg" alt="">
+                </div>
+            </div>
+            <div class="polaroid">
+                <div class="photo">
+                    <img src="./paysage.jpg" alt="">
+                </div>
+            </div>
+            <div class="polaroid">
+                <div class="photo">
+                    <img src="./portrait.jpg" alt="">
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+<script>
+    var slider = document.getElementById('slider')
+    var sliderLeft = slider.querySelector('.slider-left')
+    var sliderCenter = slider.querySelector('.slider-center')
+    var sliderRight = slider.querySelector('.slider-right')
+    function randomIntFromInterval(min, max) { // min and max included 
+    return Math.floor(Math.random() * (max - min + 1) + min)
+    }
+    const polaroids = document.querySelectorAll('.slider .polaroid');
+    for(let i = 0; i < polaroids.length;i++)
+    {
+        let polaroid = polaroids[i];
+        // polaroid.style.zIndex = i;
+        const rotate = randomIntFromInterval(0, 360);
+        const translate = randomIntFromInterval(10, 15);
+        polaroid.style.transform = `translateX(-${translate}%) rotate(${rotate}deg)`
+    }
+    var mouseX;
+    var isBlocked = false;
+    window.addEventListener('mousedown', e => {
+        mouseX = e.clientX
+    })
+    window.addEventListener('mouseup', e => {
+        if(e.clientX - mouseX < 0 && isBlocked == false)
+        {
+            isBlocked = true;
+            toLeft()
+        }
+        else if(e.clientX - mouseX > 0 && isBlocked == false)
+        {
+            isBlocked = true;
+            toRight()
+        }
+    })
+    function toLeft()
+    {
+        console.log("toLeft");
+        // Center To Left
+        const polaroidsCenter = sliderCenter.querySelectorAll(".polaroid")
+        if(polaroidsCenter.length > 0)
+        {
+            const picked = polaroidsCenter[polaroidsCenter.length-1]
+            const rotate = randomIntFromInterval(0, 360);
+            picked.style.setProperty('--rotation', `${rotate}deg`)
+            picked.style.animation = "2s ease-in forwards centerToLeft"
+            setTimeout(() => {
+                picked.style.transform = `rotate(${rotate}deg)`  
+                picked.style.animation = ""
+                sliderLeft.appendChild(picked)
+                isBlocked = false;
+                slider.focus()
+            }, 2000);
+        }
+        // Right To Center
+        const polaroidsRight = sliderRight.querySelectorAll(".polaroid")
+        if(polaroidsRight.length > 0)
+        {
+            const picked = polaroidsRight[polaroidsRight.length-1]
+            picked.style.animation = "2s ease-in forwards rightToCenter"
+            setTimeout(() => {
+                picked.style.animation = ""
+                picked.style.transform = ""
+                sliderCenter.appendChild(picked)
+                isBlocked = false;
+                slider.focus()
+            }, 2000);
+        }
+    }
+    function toRight()
+    {
+        console.log("toRight");
+         // Center To Right
+         const polaroidsCenter = sliderCenter.querySelectorAll(".polaroid")
+        if(polaroidsCenter.length > 0)
+        {
+            const picked = polaroidsCenter[polaroidsCenter.length-1]
+            const rotate = randomIntFromInterval(0, 360);
+            picked.style.setProperty('--rotation', `${rotate}deg`)
+            picked.style.animation = "2s ease-in forwards centerToRight"
+            picked.style.zIndex = "1"
+            setTimeout(() => {
+                picked.style.transform = `rotate(${rotate}deg)`  
+                picked.style.zIndex = ""
+                picked.style.animation = ""
+                sliderRight.appendChild(picked)
+                isBlocked = false;
+                slider.focus()
+            }, 2000);
+        }
+        // Left To Center
+        const polaroidsLeft = sliderLeft.querySelectorAll(".polaroid")
+        if(polaroidsLeft.length > 0)
+        {
+            const picked = polaroidsLeft[polaroidsLeft.length-1]
+            picked.style.animation = "2s ease-in forwards leftToCenter"
+            setTimeout(() => {
+                picked.style.animation = ""
+                picked.style.transform = ""
+                sliderCenter.appendChild(picked)
+                isBlocked = false;
+                slider.focus()
+            }, 2000);
+        }
+    }
+</script>
+</html>
