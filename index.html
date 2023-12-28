@@ -6,6 +6,9 @@
     <title>Polaroid slider</title>
 </head>
 <style>
+    :root{
+        --polaroidMobileWidth:90vw;
+    }
     body, html, .slider
     {
         min-height: 100vh;
@@ -83,7 +86,9 @@
 
 
     /* KEYFRAMES */
-    @keyframes rightToCenter {
+
+    /* desktop */
+    @keyframes rightToCenterDesktop {
         /* 0%{
             transform: initial;
         } */
@@ -97,7 +102,7 @@
             left: -31.5%;
         }
     }
-    @keyframes centerToLeft {
+    @keyframes centerToLeftDesktop {
         /* 0%{
             transform: initial;
         } */
@@ -108,7 +113,7 @@
             transform: rotate(var(--rotation));
         }
     }
-    @keyframes leftToCenter {
+    @keyframes leftToCenterDesktop {
         /* 0%{
             transform: initial;
         } */
@@ -122,7 +127,7 @@
             left: 90%;
         }
     }
-    @keyframes centerToRight {
+    @keyframes centerToRightDesktop {
         /* 0%{
             transform: initial;
         } */
@@ -133,40 +138,109 @@
             transform: rotate(var(--rotation));
         }
     }
+    /* Mobile */
+    @keyframes rightToCenterMobile {
+        100%{
+            transform: translateY(-50vh);
+            scale: 1;
+            right: 15vw;
+        }
+    }
+    @keyframes centerToLeftMobile {
+        100%{
+            scale: .5;
+            left: -4em;
+            transform: translateY(50vh) rotate(var(--rotation));
+        }
+    }
+    @keyframes leftToCenterMobile {
+        100%{
+            transform: translateY(-50vh);
+            scale: 1;
+            left: 15vw;
+        }
+    }
+    @keyframes centerToRightMobile {
+        100%{
+            scale: .5;
+            right: -5em;
+            transform: translateY(50vh) rotate(var(--rotation));
+        }
+    }
+    @media screen and (max-width:960px) {
+        .slider{
+            flex-wrap: wrap;
+            padding-top: 4em;
+        }
+        .polaroid{
+            margin-right: unset;
+        }
+        .slider .slider-center{
+            width: 100%;
+            flex:1 0 100%;
+            order: 1;
+        }
+        .slider .slider-left{
+            order: 2;
+        }
+        .slider .slider-right{
+            order: 3;
+        }
+        .slider-center .photo{
+            height: calc(var(--polaroidMobileWidth) * 0.8);
+        }
+        .slider-center .polaroid{
+            width: var(--polaroidMobileWidth);
+            height: calc(var(--polaroidMobileWidth) * 1.16);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .slider-left .polaroid, .slider-right .polaroid{
+            top: -5em;
+        }
+        .slider-left .polaroid{
+            left:-4em;
+        }
+        .slider-right .polaroid{
+            right:-5em;
+            left: unset;
+        }
+    }
 </style>
 <body>
-    <section class="slider" id = "slider">
-        <div class="slider-left"></div>
-        <div class="slider-center"></div>
-        <div class="slider-right">
-            <div class="polaroid">
-                <div class="photo">
-                    <img src="./paysage.jpg" alt="">
+    <section class="slider" id = "slider" draggable="false">
+        <div class="slider-left" draggable="false"></div>
+        <div class="slider-center" draggable="false"></div>
+        <div class="slider-right" draggable="false">
+            <div class="polaroid" draggable="false">
+                <div class="photo" draggable="false">
+                    <img src="./paysage.jpg" alt="" draggable="false">
                 </div>
             </div>
-            <div class="polaroid">
-                <div class="photo">
-                    <img src="./portrait.jpg" alt="">
+            <div class="polaroid" draggable="false">
+                <div class="photo" draggable="false">
+                    <img src="./portrait.jpg" alt="" draggable="false">
                 </div>
             </div>
-            <div class="polaroid">
-                <div class="photo">
-                    <img src="./paysage.jpg" alt="">
+            <div class="polaroid" draggable="false">
+                <div class="photo" draggable="false">
+                    <img src="./paysage.jpg" alt="" draggable="false">
                 </div>
             </div>
-            <div class="polaroid">
-                <div class="photo">
-                    <img src="./portrait.jpg" alt="">
+            <div class="polaroid" draggable="false">
+                <div class="photo" draggable="false">
+                    <img src="./portrait.jpg" alt="" draggable="false">
                 </div>
             </div>
-            <div class="polaroid">
-                <div class="photo">
-                    <img src="./paysage.jpg" alt="">
+            <div class="polaroid" draggable="false">
+                <div class="photo" draggable="false">
+                    <img src="./paysage.jpg" alt="" draggable="false">
                 </div>
             </div>
-            <div class="polaroid">
-                <div class="photo">
-                    <img src="./portrait.jpg" alt="">
+            <div class="polaroid" draggable="false">
+                <div class="photo" draggable="false">
+                    <img src="./portrait.jpg" alt="" draggable="false">
                 </div>
             </div>
         </div>
@@ -177,6 +251,7 @@
     var sliderLeft = slider.querySelector('.slider-left')
     var sliderCenter = slider.querySelector('.slider-center')
     var sliderRight = slider.querySelector('.slider-right')
+    var animationDevice = window.innerWidth > 960 ? "Desktop" : "Mobile"
     function randomIntFromInterval(min, max) { // min and max included 
     return Math.floor(Math.random() * (max - min + 1) + min)
     }
@@ -191,21 +266,46 @@
     }
     var mouseX;
     var isBlocked = false;
-    window.addEventListener('mousedown', e => {
+    slider.addEventListener('mousedown', e => {
         mouseX = e.clientX
     })
-    window.addEventListener('mouseup', e => {
-        if(e.clientX - mouseX < 0 && isBlocked == false)
+    slider.closest('body').addEventListener('mouseup', e => {
+        handleKeyUp(e.clientX)   
+    })
+    slider.addEventListener('touchstart', e => {
+        window.mouseX = e.targetTouches[0].clientX
+        window.isBlocked = false;
+    })
+    var isTouching = false
+    slider.addEventListener('touchmove', e => {
+        if(!isTouching)
+        {
+            window.mouseX = e.targetTouches[0].clientX
+            isTouching = true
+            setTimeout(() => {
+                handleKeyUp(window.mouseX, slider) 
+                isTouching = false
+            }, 500)
+        }
+        e.preventDefault()
+    })
+    slider.addEventListener('touchend', e => {
+        handleKeyUp(e.changedTouches[0].clientX)       
+    })
+
+    function handleKeyUp(clientX)
+    {
+        if(clientX - mouseX < 0 && isBlocked == false)
         {
             isBlocked = true;
             toLeft()
         }
-        else if(e.clientX - mouseX > 0 && isBlocked == false)
+        else if(clientX - mouseX > 0 && isBlocked == false)
         {
             isBlocked = true;
             toRight()
         }
-    })
+    }
     function toLeft()
     {
         console.log("toLeft");
@@ -216,7 +316,7 @@
             const picked = polaroidsCenter[polaroidsCenter.length-1]
             const rotate = randomIntFromInterval(0, 360);
             picked.style.setProperty('--rotation', `${rotate}deg`)
-            picked.style.animation = "2s ease-in forwards centerToLeft"
+            picked.style.animation = `2s ease-in forwards centerToLeft${animationDevice}`
             setTimeout(() => {
                 picked.style.transform = `rotate(${rotate}deg)`  
                 picked.style.animation = ""
@@ -230,7 +330,7 @@
         if(polaroidsRight.length > 0)
         {
             const picked = polaroidsRight[polaroidsRight.length-1]
-            picked.style.animation = "2s ease-in forwards rightToCenter"
+            picked.style.animation = `2s ease-in forwards rightToCenter${animationDevice}`
             setTimeout(() => {
                 picked.style.animation = ""
                 picked.style.transform = ""
@@ -250,7 +350,7 @@
             const picked = polaroidsCenter[polaroidsCenter.length-1]
             const rotate = randomIntFromInterval(0, 360);
             picked.style.setProperty('--rotation', `${rotate}deg`)
-            picked.style.animation = "2s ease-in forwards centerToRight"
+            picked.style.animation = `2s ease-in forwards centerToRight${animationDevice}`
             picked.style.zIndex = "1"
             setTimeout(() => {
                 picked.style.transform = `rotate(${rotate}deg)`  
@@ -266,7 +366,7 @@
         if(polaroidsLeft.length > 0)
         {
             const picked = polaroidsLeft[polaroidsLeft.length-1]
-            picked.style.animation = "2s ease-in forwards leftToCenter"
+            picked.style.animation = `2s ease-in forwards leftToCenter${animationDevice}`
             setTimeout(() => {
                 picked.style.animation = ""
                 picked.style.transform = ""
