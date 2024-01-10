@@ -110,8 +110,66 @@
         width: max-content;
     }
     
-
-
+    .slider .sliderHand{
+        display: none;
+        position: absolute;
+        z-index: 5;
+        top: 90%;
+        left: 50%;
+        transform: translateX(-50%);
+        transform-origin: bottom;
+        animation: handSlide 3s ease-in-out infinite;
+    }
+    
+    .curvedArrow{
+        display: none;
+        position: absolute;
+        z-index: 4;
+        top: 85%;
+        left: 51%;
+        transform: translateX(-50%) rotateZ(140deg);
+    }
+    .curvedArrow path {
+        --path-length: 1500;
+        stroke-dasharray: var(--path-length);
+        /* stroke-dashoffset: var(--path-length); */
+        animation: 3s fillSvg 2s infinite;
+    }
+    .curvedArrow polyline, .curvedArrow path{
+        fill: none;
+        stroke: #000000;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.5;
+    }
+    .chevronLeft,.chevronRight{
+        cursor: pointer;
+        display: block;
+        height: 3em;
+        width: 1.5em;
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-color: transparent;
+        border: none;
+        filter: invert(1);
+        z-index: 6;
+        transition: all .4s;
+    }
+    .chevronLeft:hover,.chevronRight:hover{
+        filter: unset;
+        background-color: rgba(0, 0, 0, 0.234);
+        border-radius: 8px;
+        scale: 1.15;
+    }
+    .chevronLeft{
+        left:1.5em;
+        background-image: url(./chevron-left.svg);
+    }
+    .chevronRight{
+        right:1.5em;
+        background-image: url(./chevron-right.svg);
+    }
     /* KEYFRAMES */
 
     /* desktop */
@@ -153,16 +211,16 @@
             scale:.25;
         }
         to{
-            transform: translateY(-25vh);
+            transform: translateY(-50vh);
             scale: 1.5;
-            right: 15vw;
+            right: 25vw;
         }
     }
     @keyframes centerToLeftMobile {
         to{
-            scale: .5;
+            scale: .25;
             left: -4em;
-            transform: translateY(50vh) rotate(var(--rotation));
+            transform: translateY(100vh) rotate(var(--rotation));
         }
     }
     @keyframes leftToCenterMobile {
@@ -177,12 +235,41 @@
     }
     @keyframes centerToRightMobile {
         to{
-            scale: .5;
+            scale: .25;
             right: -5em;
-            transform: translateY(50vh) rotate(var(--rotation));
+            transform: translateY(100vh) rotate(var(--rotation));
         }
     }
-    @media screen and (max-width:960px) {
+    @keyframes handSlide {
+        0%{
+            rotate: 85deg;
+        }
+        15%{
+            rotate: 85deg;
+        }
+        50%{
+            rotate: -5deg;
+        }
+        65%{
+            rotate: -5deg;
+        }
+        100%{
+            rotate: 85deg;
+        }
+    }
+    
+    @keyframes fillSvg{
+        0%{
+            stroke-dashoffset: var(--path-length);
+        }
+        50%{
+            stroke-dashoffset: var(--path-length);
+        }
+        100%{
+            stroke-dashoffset: 0;
+        }
+      }
+    @media screen and (max-width:960px) and (orientation:portrait) {
         .slider{
             flex-wrap: wrap;
             padding-top: 2em;
@@ -230,12 +317,19 @@
             z-index: 3;
         }
         .slider .slider-center .polaroid{
-            top: 0;
+            top: -5em;
+        }
+        .curvedArrow,.slider .sliderHand{
+            display: block;
+        }
+        .chevronLeft,.chevronRight{
+            display: none;
         }
     }
 </style>
 <body>
     <section class="slider" id = "slider" draggable="false">
+        <button type="button" class="chevronLeft" id="chevronLeft" onClick='toLeft()'></button>
         <div class="slider-left" draggable="false"></div>
         <div class="slider-center" draggable="false"></div>
         <div class="slider-right" draggable="false">
@@ -276,6 +370,15 @@
                 </div>
             </div>
         </div>
+        <button type="button" class="chevronRight" id="chevronRight" onClick='toRight()'></button>
+        <Img src="./hand_small.png" alt="slider indicating hand" width="64px" height="87px" class="sliderHand"/>
+        <svg fill="#000000" width="128px" height="128px" version="1.1" class="curvedArrow" id="Capa_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 415.262 415.261" transform="matrix(-1, 0, 0, 1, 0, 0)rotate(-45)">
+            <g id="iconCarrier"> 
+                <g> 
+                    <path d="M414.937,374.984c-7.956-24.479-20.196-47.736-30.601-70.992c-1.224-3.06-6.12-3.06-7.956-1.224 c-10.403,11.016-22.031,22.032-28.764,35.496h-0.612c-74.664,5.508-146.88-58.141-198.288-104.652 c-59.364-53.244-113.22-118.116-134.64-195.84c-1.224-9.792-2.448-20.196-2.448-30.6c0-4.896-6.732-4.896-7.344,0 c0,1.836,0,3.672,0,5.508C1.836,12.68,0,14.516,0,17.576c0.612,6.732,2.448,13.464,3.672,20.196 C8.568,203.624,173.808,363.356,335.376,373.76c-5.508,9.792-10.403,20.195-16.523,29.988c-3.061,4.283,1.836,8.567,6.12,7.955 c30.6-4.283,58.14-18.972,86.292-29.987C413.712,381.104,416.16,378.656,414.937,374.984z M332.928,399.464 c3.673-7.956,6.12-15.912,10.404-23.868c1.225-3.061-0.612-5.508-2.448-6.12c0-1.836-1.224-3.061-3.06-3.672 c-146.268-24.48-264.996-124.236-309.06-259.489c28.764,53.244,72.828,99.756,116.28,138.924 c31.824,28.765,65.484,54.468,102.204,75.888c28.764,16.524,64.872,31.824,97.92,21.421l0,0c-1.836,4.896,5.508,7.344,7.956,3.672 c7.956-10.404,15.912-20.196,24.48-29.376c8.567,18.972,17.748,37.943,24.479,57.527 C379.44,382.94,356.796,393.956,332.928,399.464z"></path> 
+                </g> 
+            </g>
+        </svg>
     </section>
 </body>
 <script>
