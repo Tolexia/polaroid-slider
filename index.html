@@ -185,7 +185,7 @@
     @media screen and (max-width:960px) {
         .slider{
             flex-wrap: wrap;
-            padding-top: 4em;
+            padding-top: 2em;
         }
         .slider > div{
             height: 100%;
@@ -197,7 +197,9 @@
             width: 100%;
             flex:1 0 100%;
             order: 1;
+            height: 10em;
         }
+        
         .slider .slider-left{
             order: 2;
         }
@@ -226,6 +228,9 @@
         .slider-right .polaroid{
             left: -25vw;
             z-index: 3;
+        }
+        .slider .slider-center .polaroid{
+            top: 0;
         }
     }
     @media screen and (min-width:1400px)
@@ -409,5 +414,7 @@
             }, 2000);
         }
     }
+    window.addEventListener('resize', () => window.location.reload())
+    screen.orientation.addEventListener('change', () => window.location.reload())
 </script>
 </html>
